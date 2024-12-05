@@ -1,13 +1,35 @@
 init python:
+
+    character_sprites = SpriteManager(update = npc_movement, event = character_events)
+    character_1 = character_sprites.create("character_1.png")
+    character_2 = character_sprites.create("character_2.png")
+    character_3 = character_sprites.create("character_3.png")
+
+    character_start_xpos = 100
+    goal_xpos = 1500
+    player_char_speed = 20
+
+#key variables
+    left_key_pressed = False
+    right_key_pressed = False
+    player_start_move = False
+
+#Other variables
+    selected_character = None
+    selected_character_pos = [0,0]
+    who_won = None
+    goal_reached = False
+    timer= 3
+
     def reset_racing_game():
-        #Function to reset variables
+        #Function to reset variablesadd c
         global selected_character
         global selected_character_pos
         global who_won
         global goal_reached
-        global countdown_timer
+        global timer
 
-        countdown_timer = 3
+        timer = 3
         who_won = None
         goal_reached = False
         selected_character = None
@@ -22,7 +44,7 @@ init python:
         renpy.show_screen("racing_game_menu")
 
     def npc_movement(st):
-        if not goal_reached and countdown_timer == 0:
+        if not goal_reached and timer == 0:
             if selected_character == "character_1":
                 npc_move(character = character_2)
                 npc_move(character = character_3)
@@ -36,7 +58,7 @@ init python:
                 npc_move(character = character_2)
             return 0
 
-        elif countdown_timer != 0:
+        elif timer != 0:
             return 0
 
         else:
@@ -75,7 +97,7 @@ init python:
         global right_key_pressed
         global player_start_move
 
-        if event.type == renpy.pygame_sdl2.KEYDOWN and countdown_timer == 0:
+        if event.type == renpy.pygame_sdl2.KEYDOWN and timer == 0:
             keys_pressed = renpy.pygame_sdl2.key.get_pressed()
 
             if keys_pressed[renpy.pygame_sdl2.K_LEFT]:
@@ -100,16 +122,17 @@ init python:
         global selected_character_pos
 
         character_1.x = character_start_xpos
-        character_1.y = 500
-        character_1.speed = 0.1
+        character_1.y = 550
+        character_1.speed = 0.4
 
         character_2.x = character_start_xpos
         character_2.y = 620
-        character_2.speed=0.4
+        character_2.speed= 0.6
 
         character_3.x = character_start_xpos
         character_3.y=730
-        character_3.speed = 0.3
+        character_3.speed = 0.5
+
 
         if selected_character == "character_1":
             selected_character_pos = [character_1.x, character_1.y]
@@ -122,9 +145,9 @@ init python:
         renpy.show_screen("racing_mini_game")
 
     def decrement_timer():
-        global countdown_timer
-        if countdown_timer > 0:
-            countdown_timer -= 1
+        global timer
+        if timer > 0:
+            timer -= 1
 
 screen game_over:
     modal True
@@ -142,30 +165,30 @@ screen game_over:
                 if who_won == character_1:
                     if selected_character == "character_1":
                         text "You won!" size 40 align (0.5, 0.4)
-                        textbutton "EXIT" align (0.5, 0.8) action Return()
+                        textbutton "EXIT" align (0.5, 0.8) action [Hide("game_over"), Hide("racing_mini_game"), Hide("countdown_timer"), Jump("after_race")]
                     else:
-                        text "character_1 won!" size 40 align (0.5, 0.4)
+                        text "Asta won!" size 40 align (0.5, 0.4)
                         textbutton "Play again!" align(0.5, 0.8) action Function(reset_racing_game)
 
                 elif who_won == character_2:
                     if selected_character == "character_2":
                         text "You won!" size 40 align (0.5, 0.4)
-                        textbutton "EXIT" align (0.5, 0.8) action Return()
+                        textbutton "EXIT" align (0.5, 0.8) action [Hide("game_over"), Hide("racing_mini_game"), Hide("countdown_timer"), Jump("after_race")]
                     else:
-                        text "character_2 won!" size 40 align (0.5, 0.4)
+                        text "Ed won!" size 40 align (0.5, 0.4)
                         textbutton "Play again!" align(0.5, 0.8) action Function(reset_racing_game)
 
                 elif who_won == character_3:
                     if selected_character == "character_3":
                         text "You won!" size 40 align (0.5, 0.4)
-                        textbutton "EXIT" align (0.5, 0.8) action Return()
+                        textbutton "EXIT" align (0.5, 0.8) action [Hide("game_over"), Hide("racing_mini_game"), Hide("countdown_timer"), Jump("after_race")]
                     else:
-                        text "character_3 won!" size 40 align (0.5, 0.4)
+                        text "The Titan won!" size 40 align (0.5, 0.4)
                         textbutton "Play again!" align(0.5, 0.8) action Function(reset_racing_game)
             else:
                 text "No winner yet!" size 40 align (0.5, 0.4)
+                textbutton "EXIT" align(0.5, 0.8) action [Hide("game_over"), Hide("racing_mini_game"), Hide("countdown_timer"), Jump("after_race")]
 
-            
 
 screen countdown_timer:
     frame:
@@ -175,7 +198,7 @@ screen countdown_timer:
         vbox:
             align(0.5, 0.5)
             text "Get Ready!" size 40 xalign 0.5
-            text "[countdown_timer]" size 40 xalign 0.5
+            text "[timer]" size 40 xalign 0.5
     timer 1.0 action Function(decrement_timer) repeat True
 
 
@@ -185,9 +208,11 @@ screen racing_mini_game:
     key ["K_LEFT", "K_RIGHT"] action NullAction()
     image "background.png"
 
+# If you're using a particle system, make sure it's added to the screen as a displayable:
+    # Show player character sprite (dynamically updated)
     add character_sprites
-
-    if not player_start_move and countdown_timer == 0:
+       
+    if not player_start_move and timer == 0:
         frame:
             align(0.5, 0.3)
             xysize(600, 250)
@@ -197,23 +222,32 @@ screen racing_mini_game:
                 align(0.5, 0.5)
                 text "Alternate arrow keys to move" xalign 0.5
                 add "arrow_keys" xalign 0.5
-
-    image "player_indicator.png" xpos selected_character_pos[0] + 50 ypos selected_character_pos[1] - 50
+    if selected_character == "character_1":
+        image "player_indicator.png" xpos selected_character_pos[0] + 200 ypos selected_character_pos[1] - 50 
+    elif selected_character == "character_2":
+        image "player_indicator.png" xpos selected_character_pos[0] + 200 ypos selected_character_pos[1] - 50 
+    else:
+        image "player_indicator.png" xpos selected_character_pos[0] + 205 ypos selected_character_pos[1] - 50 
 
 screen racing_game_menu:
     image "background.png"
     image Solid("#00000080")
 
     text "Select a character!" size 50 align(0.5,0.1)
-    
+    default tt = Tooltip("")
     hbox:
         align (0.5, 0.4)
         spacing 10
-        imagebutton auto "character_1_%s.png" selected If(selected_character == "character_1", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_1")
-        imagebutton auto "character_2_%s.png" selected If(selected_character == "character_2", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_2")
-        imagebutton auto "character_3_%s.png" selected If(selected_character == "character_3", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_3")
+        imagebutton auto "character_1_%s.png" selected If(selected_character == "character_1", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_1") hovered tt.Action("Asta") 
+        imagebutton auto "character_2_%s.png" selected If(selected_character == "character_2", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_2") hovered tt.Action("Ed") 
+        imagebutton auto "character_3_%s.png" selected If(selected_character == "character_3", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_3") hovered tt.Action("Titan") 
     imagebutton idle "play_button_idle.png" sensitive If(selected_character is not None, True, False) action Function(setup_racing_game) align(0.5, 0.8)
 
+    frame:
+        text tt.value:
+            xalign 0.5
+            yalign 0.3
+    
 
 image arrow_keys:
     zoom 0.5
@@ -222,29 +256,3 @@ image arrow_keys:
     "arrow_keys_2.png"
     pause 0.5
     repeat
-
-#sprites
-default character_sprites = SpriteManager(update = npc_movement, event = character_events)
-default character_1 = character_sprites.create("character_1.png")
-default character_2 = character_sprites.create("character_2.png")
-default character_3 = character_sprites.create("character_3.png")
-
-#character variables
-default character_start_xpos = 100
-default goal_xpos = 1500
-default player_char_speed = 20
-
-#key variables
-default left_key_pressed = False
-default right_key_pressed = False
-default player_start_move = False
-
-#Other variables
-default selected_character = None
-default selected_character_pos = [0,0]
-default who_won = None
-default goal_reached = False
-default countdown_timer= 3
-
-
-
