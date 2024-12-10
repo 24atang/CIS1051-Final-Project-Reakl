@@ -1,4 +1,3 @@
-
 label start:  
     scene new_school_gym:
         xysize(1920,1080)
