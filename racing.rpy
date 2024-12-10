@@ -122,11 +122,11 @@ init python:
         global selected_character_pos
 
         character_1.x = character_start_xpos
-        character_1.y = 550
+        character_1.y = 525
         character_1.speed = 0.4
 
         character_2.x = character_start_xpos
-        character_2.y = 620
+        character_2.y = 630
         character_2.speed= 0.6
 
         character_3.x = character_start_xpos
@@ -167,7 +167,7 @@ screen game_over:
                         text "You won!" size 40 align (0.5, 0.4)
                         textbutton "EXIT" align (0.5, 0.8) action [Hide("game_over"), Hide("racing_mini_game"), Hide("countdown_timer"), Jump("after_race")]
                     else:
-                        text "Asta won!" size 40 align (0.5, 0.4)
+                        text "Pasta won!" size 40 align (0.5, 0.4)
                         textbutton "Play again!" align(0.5, 0.8) action Function(reset_racing_game)
 
                 elif who_won == character_2:
@@ -175,7 +175,7 @@ screen game_over:
                         text "You won!" size 40 align (0.5, 0.4)
                         textbutton "EXIT" align (0.5, 0.8) action [Hide("game_over"), Hide("racing_mini_game"), Hide("countdown_timer"), Jump("after_race")]
                     else:
-                        text "Ed won!" size 40 align (0.5, 0.4)
+                        text "Bed won!" size 40 align (0.5, 0.4)
                         textbutton "Play again!" align(0.5, 0.8) action Function(reset_racing_game)
 
                 elif who_won == character_3:
@@ -238,8 +238,8 @@ screen racing_game_menu:
     hbox:
         align (0.5, 0.4)
         spacing 10
-        imagebutton auto "character_1_%s.png" selected If(selected_character == "character_1", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_1") hovered tt.Action("Asta") 
-        imagebutton auto "character_2_%s.png" selected If(selected_character == "character_2", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_2") hovered tt.Action("Ed") 
+        imagebutton auto "character_1_%s.png" selected If(selected_character == "character_1", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_1") hovered tt.Action("Pasta") 
+        imagebutton auto "character_2_%s.png" selected If(selected_character == "character_2", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_2") hovered tt.Action("Bed") 
         imagebutton auto "character_3_%s.png" selected If(selected_character == "character_3", True, False) align(0.5, 0.5) action SetVariable("selected_character", "character_3") hovered tt.Action("Titan") 
     imagebutton idle "play_button_idle.png" sensitive If(selected_character is not None, True, False) action Function(setup_racing_game) align(0.5, 0.8)
 
